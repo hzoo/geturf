@@ -56,7 +56,7 @@ function cron(timestamp) {
     var nextTimestamp = timestamp + 300;
     setTimeout(function() {
         fetchURFMatches(nextTimestamp);
-    }, 10000);
+    }, 5000);
 }
 
 p1.then(function(timestamp) {

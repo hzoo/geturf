@@ -3,7 +3,7 @@
   "description": "get urf matches",
   "version": "0.0.1",
   "scripts": {
-    "start": "node ./index"
+    "start": "node index.js"
   },
   "dependencies": {
     "firebase": "^2.2.3",
