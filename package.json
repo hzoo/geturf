@@ -1,0 +1,18 @@
+{
+  "name": "geturf",
+  "description": "get urf matches",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node ./index"
+  },
+  "dependencies": {
+    "firebase": "^2.2.3",
+    "lolapi": "^0.2.3",
+    "nconf": "^0.7.1"
+  },
+  "main": "index.js",
+  "engines": {
+    "iojs": "~1.6.3",
+    "npm": "~2.7.6"
+  }
+}
