@@ -46,17 +46,20 @@ function fetchURFMatches(timestamp) {
             // then re run.
             if (timestamp + 300 < (Date.now() / 1000)) {
                 cron(timestamp);
+            } else {
+                // check fresh data every 10 minutes
+                cron(timestamp, 600000)
             }
         }
     });
 }
 
-function cron(timestamp) {
+function cron(timestamp, interval) {
     // go to the next 5 minutes
     var nextTimestamp = timestamp + 300;
     setTimeout(function() {
         fetchURFMatches(nextTimestamp);
-    }, 5000);
+    }, interval || 2000);
 }
 
 p1.then(function(timestamp) {
