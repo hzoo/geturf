@@ -12,7 +12,6 @@
   },
   "main": "index.js",
   "engines": {
-    "iojs": "~1.6.3",
-    "npm": "~2.7.6"
+    "iojs": "~1.6.3"
   }
 }
