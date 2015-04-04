@@ -24,11 +24,14 @@ function(resolve) {
   });
 });
 
+var longInterval = 600000;
 function fetchURFMatches(timestamp) {
     lolapi.ApiChallenge.get(timestamp, function(error, result) {
         console.log(timestamp);
         if (error) {
             console.log('Error: ', error);
+            // try again
+            cron(timestamp, longInterval);
         } else {
             console.log(`${result.length} Games played`);
 
@@ -48,7 +51,7 @@ function fetchURFMatches(timestamp) {
                 cron(timestamp);
             } else {
                 // check fresh data every 10 minutes
-                cron(timestamp, 600000)
+                cron(timestamp, longInterval)
             }
         }
     });
