@@ -1,15 +1,42 @@
 module.exports = function(options) {
-    var gameIdsUrl = options.firebaseGameIdsUrl;
-    var matchUrl = options.firebaseMatchUrl;
-    var Firebase = options.firebase;
-    var lolapi = options.lolapi;
+    const mysql = require('mysql');
+    const connection = mysql.createConnection({
+      host: options.host,
+      user: options.user,
+      password: options.password,
+      database: 'URF'
+    });
 
-    var idsRef = new Firebase(`https://${gameIdsUrl}.firebaseio.com/`);
-    var matchesRef = new Firebase(`https://${matchUrl}.firebaseio.com/`);
+    connection.connect();
+
+    const gameIdsUrl = options.firebaseGameIdsUrl;
+    const matchUrl = options.firebaseMatchUrl;
+    const Firebase = options.firebase;
+    const lolapi = options.lolapi;
+
+    const idsRef = new Firebase(`https://${gameIdsUrl}.firebaseio.com/`);
+    const matchesRef = new Firebase(`https://${matchUrl}.firebaseio.com/`);
 
     var matches = [];
     var currentMatchIndex;
     var timestamp;
+
+    function createInsertQuery(table, obj) {
+        return `
+            INSERT INTO ${table} (
+                ${Object.keys(obj).join(',')}
+            )
+            VALUES (
+                ${Object.keys(obj).map(key => {
+                    if (typeof obj[key] === 'string') {
+                        return '"' + obj[key] + '"';
+                    } else {
+                        return obj[key];
+                    }
+                }).join(',')}
+            )
+        `;
+    }
 
     function fetchMatchData(matchId) {
         lolapi.Match.get(matchId, function(error, result) {
@@ -19,16 +46,43 @@ module.exports = function(options) {
             } else {
                 // trim data
                 var data = result;
-                delete data.mapId;
-                delete data.matchId;
-                delete data.matchMode;
-                delete data.matchType;
-                delete data.matchVersion;
-                delete data.participantIdentities;
-                delete data.queueType;
-                delete data.season;
-                delete data.region;
 
+                // bans
+                let bansData = data.teams[0].bans.slice(0).concat(data.teams[1].bans);
+                bansData.forEach((ban) => {
+                    // add the matchId as a key
+                    ban.matchId = data.matchId;
+
+                    // add region
+                    ban.region = data.region;
+
+                    // add to db
+                    const insertBanQuery = createInsertQuery('bans', ban);
+                    // console.log(insertBanQuery);
+
+                    connection.query(insertBanQuery, function(err, rows) {
+                        if (err && err.code !== 'ER_DUP_ENTRY') throw err;
+                    });
+                });
+
+                // add matches to db
+                const match = {
+                    matchCreation: data.matchCreation,
+                    matchDuration: data.matchDuration,
+                    matchId: data.matchId,
+                    region: data.region
+                }
+                // console.log(match);
+
+                const insertMatchQuery = createInsertQuery('matches', match);
+                // console.log(insertMatchQuery);
+
+                connection.query(insertMatchQuery, function(err, rows) {
+                    if (err && err.code !== 'ER_DUP_ENTRY') throw err;
+                });
+
+                // add champion data
+                // filter data
                 data.participants.forEach(function(d) {
                     delete d.masteries;
                     delete d.runes;
@@ -50,6 +104,7 @@ module.exports = function(options) {
                     delete d.stats.sightWardsBoughtInGame;
                     delete d.stats.totalPlayerScore;
                     delete d.stats.totalScoreRank;
+                    delete d.stats.totalUnitsHealed;
                     delete d.stats.visionWardsBoughtInGame;
                     delete d.stats.wardsKilled;
                     delete d.stats.wardsPlaced;
@@ -57,28 +112,40 @@ module.exports = function(options) {
                     delete d.timeline.damageTakenPerMinDeltas;
                     delete d.timeline.goldPerMinDeltas;
                     delete d.timeline.xpPerMinDeltas;
+                    delete d.timeline.csDiffPerMinDeltas;
+                    delete d.timeline.damageTakenDiffPerMinDeltas;
+                    delete d.timeline.xpDiffPerMinDeltas;
                 });
+                data.participants.forEach(function(d) {
+                    Object.keys(d.stats).forEach(function(key) {
+                        d[key] = d.stats[key];
+                    });
+                    d.lane = d.timeline.lane;
+                    d.role = d.timeline.role;
+                    delete d.stats;
+                    delete d.timeline;
 
-                data.teams.forEach(function(d) {
-                    delete d.vilemawKills;
-                    delete d.baronKills;
-                    delete d.dominionVictoryScore;
-                    delete d.dragonKills;
-                    delete d.firstBaron;
-                    delete d.firstBlood;
-                    delete d.firstDragon;
-                    delete d.firstInhibitor;
-                    delete d.firstTower;
-                    delete d.inhibitorKills;
-                    delete d.teamId;
-                    delete d.towerKills;
-                    delete d.winner;
+                    // add region
+                    d.region = data.region;
+
+                    // change teamId to a bit
+                    if (d.teamId === 100) {
+                        d.teamId = 0;
+                    } else if (d.teamId === 200) {
+                        d.teamId = 1;
+                    }
+
+                    // add the matchId as a key
+                    d.matchId = data.matchId;
+
+                    // insert into db
+                    const insertPlayersQuery = createInsertQuery('players', d);
+                    // console.log(insertPlayersQuery);
+
+                    connection.query(insertPlayersQuery, function(err, rows) {
+                        if (err && err.code !== 'ER_DUP_ENTRY') throw err;
+                    });
                 });
-
-                // save matchId data
-                var resultObject = {};
-                resultObject[matchId] = data;
-                matchesRef.update(resultObject);
 
                 // save last updated matchId
                 matchesRef.update({
@@ -96,8 +163,8 @@ module.exports = function(options) {
                     timestamp = timestamp + 300;
                     if (timestamp < (Date.now() / 1000)) {
                         idsRef.child(timestamp).on('value', function(snapshot) {
-                            var arr = snapshot.val();
-                            console.log(arr);
+                            const arr = snapshot.val();
+                            console.log('num matches: ' + arr.length);
 
                             matches = arr;
                             currentMatchIndex = 0;
@@ -105,8 +172,8 @@ module.exports = function(options) {
                         });
                     } else {
                         idsRef.child(timestamp).on('value', function(snapshot) {
-                            var arr = snapshot.val();
-                            console.log(arr);
+                            const arr = snapshot.val();
+                            console.log('num matches: ' + arr.length);
 
                             matches = arr;
                             currentMatchIndex = 0;
@@ -119,28 +186,29 @@ module.exports = function(options) {
     }
 
     function cron(matchId, interval) {
+        console.log('cron: ' + matchId);
         setTimeout(function() {
             fetchMatchData(matchId);
         }, interval || 1250);
     }
 
     // get timestamp of last match saved
-    var p1 = new Promise(
-    function(resolve) {
-      matchesRef.child('lastTimestampFetched').on('value', function(snapshot) {
-        resolve(snapshot.val());
-      }, function(errorObject) {
-        console.log(`matchesRef: The read failed: ${errorObject.code}`);
-      });
+    const p1 = new Promise(
+        function(resolve) {
+            matchesRef.child('lastTimestampFetched').on('value', function(snapshot) {
+            resolve(snapshot.val());
+        }, function(errorObject) {
+            console.log(`matchesRef: The read failed: ${errorObject.code}`);
+        });
     });
 
     p1.then(function(lastTimestampFetched) {
-        console.log(lastTimestampFetched);
+        console.log('p1 then: ' + lastTimestampFetched.timestamp);
         timestamp = lastTimestampFetched.timestamp;
         // use timestamp to get array of matches
         idsRef.child(timestamp).on('value', function(snapshot) {
-            var arr = snapshot.val();
-            console.log(arr);
+            const arr = snapshot.val();
+            console.log('num matches: ' + arr.length);
 
             matches = arr;
             currentMatchIndex = lastTimestampFetched.currentMatchIndex || 0;

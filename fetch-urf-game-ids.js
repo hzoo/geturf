@@ -1,12 +1,12 @@
 module.exports = function(options) {
-    firebaseUrl = options.firebaseUrl;
-    Firebase = options.firebase;
-    lolapi = options.lolapi;
+    const firebaseUrl = options.firebaseUrl;
+    const Firebase = options.firebase;
+    const lolapi = options.lolapi;
 
-    var ref = new Firebase(`https://${firebaseUrl}.firebaseio.com/`);
+    const ref = new Firebase(`https://${firebaseUrl}.firebaseio.com/`);
 
     // get lastTimestamp from firebase (first urf match is 1427866500)
-    var p1 = new Promise(
+    const p1 = new Promise(
     function(resolve) {
       ref.child('lastTimestamp').on('value', function(snapshot) {
         resolve(snapshot.val());
@@ -15,7 +15,8 @@ module.exports = function(options) {
       });
     });
 
-    var longInterval = 600000;
+    const longInterval = 600000;
+
     function fetchURFMatches(timestamp) {
         lolapi.ApiChallenge.get(timestamp, function(error, result) {
             console.log(timestamp);
@@ -28,7 +29,7 @@ module.exports = function(options) {
                 console.log(`${result.length} Games played`);
 
                 // save list of match IDs to the timestamp given
-                var resultObject = {};
+                let resultObject = {};
                 resultObject[timestamp] = result;
                 ref.update(resultObject);
 

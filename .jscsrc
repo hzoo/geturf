@@ -32,7 +32,7 @@
     "beforeOpeningRoundBrace": true
   },
   "disallowSpacesInsideArrayBrackets": true,
-  "disallowSpacesInsideParentheses": true,
+  // "disallowSpacesInsideParentheses": true,
   "disallowTrailingComma": true,
   "disallowTrailingWhitespace": true,
   "requireCommaBeforeLineBreak": true,
