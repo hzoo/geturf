@@ -49,10 +49,20 @@ module.exports = function(options) {
                 var data = result;
 
                 // bans
-                let bansData = data.teams[0].bans.slice(0).concat(data.teams[1].bans);
+                let bansData = [];
+
+                if (data.teams[0].bans) {
+                    bansData.concat(data.teams[0].bans);
+                }
+
+                if (data.teams[1].bans) {
+                    bansData.concat(data.teams[1].bans);
+                }
+
                 bansData.forEach((ban) => {
+                    console.log(ban);
                     // add the matchId as a key
-                    ban.matchId = data.matchId;
+                    ban.matchId = matchId;
 
                     // add region
                     ban.region = data.region;
