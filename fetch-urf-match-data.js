@@ -22,20 +22,36 @@ module.exports = function(options) {
     var currentMatchIndex;
     var timestamp;
 
+    function getObjectValues(obj) {
+        return Object.keys(obj).map(key => {
+            if (typeof obj[key] === 'string') {
+                return '"' + obj[key] + '"';
+            } else {
+                return obj[key];
+            }
+        }).join(',');
+    }
+
     function createInsertQuery(table, obj) {
         return `
             INSERT INTO ${table} (
                 ${Object.keys(obj).join(',')}
             )
             VALUES (
-                ${Object.keys(obj).map(key => {
-                    if (typeof obj[key] === 'string') {
-                        return '"' + obj[key] + '"';
-                    } else {
-                        return obj[key];
-                    }
-                }).join(',')}
+                ${getObjectValues(obj)}
             )
+        `;
+    }
+
+    function createBatchedInsertQuery(table, obj, valuesArr) {
+        return `
+            INSERT INTO ${table} (
+                ${Object.keys(obj).join(',')}
+            )
+            VALUES
+                ${valuesArr.map(function(o) {
+                    return `(${o})`;
+                }).join(',')}
         `;
     }
 
@@ -52,15 +68,15 @@ module.exports = function(options) {
                 let bansData = [];
 
                 if (data.teams[0].bans) {
-                    bansData.concat(data.teams[0].bans);
+                    bansData = bansData.concat(data.teams[0].bans);
                 }
 
                 if (data.teams[1].bans) {
-                    bansData.concat(data.teams[1].bans);
+                    bansData = bansData.concat(data.teams[1].bans);
                 }
 
+                var insertBanQueryArr = [];
                 bansData.forEach((ban) => {
-                    console.log(ban);
                     // add the matchId as a key
                     ban.matchId = matchId;
 
@@ -68,12 +84,17 @@ module.exports = function(options) {
                     ban.region = data.region;
 
                     // add to db
-                    const insertBanQuery = createInsertQuery('bans', ban);
-                    // console.log(insertBanQuery);
+                    insertBanQueryArr.push(getObjectValues(ban));
 
-                    connection.query(insertBanQuery, function(err, rows) {
-                        if (err && err.code !== 'ER_DUP_ENTRY') throw err;
-                    });
+                    // const insertBanQuery = createInsertQuery('bans', ban);
+                    // connection.query(insertBanQuery, function(err, rows) {
+                    //     if (err && err.code !== 'ER_DUP_ENTRY') throw err;
+                    // });
+                });
+
+                const insertBanQuery = createBatchedInsertQuery('bans', bansData[0], insertBanQueryArr);
+                connection.query(insertBanQuery, function(err, rows) {
+                    if (err && err.code !== 'ER_DUP_ENTRY') throw err;
                 });
 
                 // add matches to db
@@ -95,6 +116,7 @@ module.exports = function(options) {
 
                 // add champion data
                 // filter data
+                var insertPlayersQueryArr = [];
                 data.participants.forEach(function(d) {
                     delete d.masteries;
                     delete d.runes;
@@ -128,6 +150,7 @@ module.exports = function(options) {
                     delete d.timeline.damageTakenDiffPerMinDeltas;
                     delete d.timeline.xpDiffPerMinDeltas;
                 });
+
                 data.participants.forEach(function(d) {
                     Object.keys(d.stats).forEach(function(key) {
                         d[key] = d.stats[key];
@@ -151,12 +174,17 @@ module.exports = function(options) {
                     d.matchId = data.matchId;
 
                     // insert into db
-                    const insertPlayersQuery = createInsertQuery('players', d);
-                    // console.log(insertPlayersQuery);
+                    insertPlayersQueryArr.push(getObjectValues(d));
 
-                    connection.query(insertPlayersQuery, function(err, rows) {
-                        if (err && err.code !== 'ER_DUP_ENTRY') throw err;
-                    });
+                    // const insertPlayersQuery = createInsertQuery('players', d);
+                    // connection.query(insertPlayersQuery, function(err, rows) {
+                    //     if (err && err.code !== 'ER_DUP_ENTRY') throw err;
+                    // });
+                });
+
+                const insertPlayersQuery = createBatchedInsertQuery('players', data.participants[0], insertPlayersQueryArr);
+                connection.query(insertPlayersQuery, function(err, rows) {
+                    if (err && err.code !== 'ER_DUP_ENTRY') throw err;
                 });
 
                 // update last timestamp in db
