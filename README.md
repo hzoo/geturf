@@ -1,7 +1,5 @@
-Get Urf Matches
+Urf
 ---
-
-Using io.js.
 
 Create a json file at `./config.json`.
 
@@ -10,7 +8,10 @@ Create a json file at `./config.json`.
     "FIREBASE_URL_GAMEIDS": "geturf", // https://<THIS-URL>.firebaseio.com/
     "FIREBASE_URL_MATCH_DATA": "urfmatches", 
     "LOL_REGION": "LOL-REGION-HERE", // ex: na
-    "LOL_TOKEN": "LOL-API-TOKEN-HERE"
+    "LOL_TOKEN": "LOL-API-TOKEN-HERE",
+    "HOST": "DB-HOST-HERE",
+    "DB_USER": "DB-USER-HERE",
+    "DB_PASSWORD": "DB-PASSWORD-HERE"
 }
 ```
 

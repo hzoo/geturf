@@ -2,8 +2,6 @@
 .tmp
 app/bower_components
 node_modules
-Gruntfile.js
 config.json
 npm-debug.log
 example-match-query.json
-db.json

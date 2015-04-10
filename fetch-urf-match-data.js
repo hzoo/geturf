@@ -78,7 +78,7 @@ module.exports = function(options) {
                 var insertBanQueryArr = [];
                 bansData.forEach((ban) => {
                     // add the matchId as a key
-                    ban.matchId = matchId;
+                    ban.matchId = data.matchId;
 
                     // add region
                     ban.region = data.region;
@@ -104,8 +104,7 @@ module.exports = function(options) {
                     matchDuration: data.matchDuration,
                     matchId: data.matchId,
                     region: data.region
-                }
-                // console.log(match);
+                };
 
                 const insertMatchQuery = createInsertQuery('matches', match);
                 // console.log(insertMatchQuery);
@@ -232,7 +231,7 @@ module.exports = function(options) {
     function cron(matchId, interval) {
         setTimeout(function() {
             fetchMatchData(matchId);
-        }, interval || 1250);
+        }, interval || 1200);
     }
 
     // get last api stats
