@@ -1,4 +1,25 @@
 module.exports = {
+    createAPITable: `
+        CREATE TABLE api (
+            lastTimestamp BIGINT UNSIGNED,
+            matchIndex SMALLINT UNSIGNED,
+            region VARCHAR(4) NOT NULL,
+            PRIMARY KEY (region)
+        )
+    `,
+    populateAPITable: `
+        INSERT INTO api
+        VALUES (NULL,NULL,'BR'),
+               (NULL,NULL,'EUNE'),
+               (NULL,NULL,'EUW'),
+               (NULL,NULL,'KR'),
+               (NULL,NULL,'LAN'),
+               (NULL,NULL,'LAS'),
+               (NULL,NULL,'NA'),
+               (NULL,NULL,'OCE'),
+               (NULL,NULL,'TR'),
+               (NULL,NULL,'RU')
+    `,
     createBanTable: `
         CREATE TABLE bans (
             championId TINYINT UNSIGNED NOT NULL,
@@ -25,7 +46,7 @@ module.exports = {
             champLevel TINYINT,
             deaths TINYINT,
             doubleKills TINYINT,
-            goldEarned SMALLINT,
+            goldEarned MEDIUMINT,
             highestAchievedSeasonTier VARCHAR(12),
             inhibitorKills TINYINT,
             item0 SMALLINT,
@@ -41,21 +62,21 @@ module.exports = {
             largestCriticalStrike SMALLINT,
             largestKillingSpree TINYINT,
             largestMultiKill TINYINT,
-            magicDamageDealt INT,
-            magicDamageDealtToChampions INT,
-            magicDamageTaken INT,
+            magicDamageDealt MEDIUMINT,
+            magicDamageDealtToChampions MEDIUMINT,
+            magicDamageTaken MEDIUMINT,
             minionsKilled SMALLINT,
             pentaKills TINYINT,
-            physicalDamageDealt INT,
-            physicalDamageDealtToChampions INT,
-            physicalDamageTaken INT,
+            physicalDamageDealt MEDIUMINT,
+            physicalDamageDealtToChampions MEDIUMINT,
+            physicalDamageTaken MEDIUMINT,
             quadraKills TINYINT,
             region VARCHAR(4) NOT NULL,
             role VARCHAR(11),
             teamId BIT,
-            totalDamageDealt INT,
-            totalDamageDealtToChampions INT,
-            totalDamageTaken INT,
+            totalDamageDealt MEDIUMINT,
+            totalDamageDealtToChampions MEDIUMINT,
+            totalDamageTaken MEDIUMINT,
             totalHeal SMALLINT,
             totalTimeCrowdControlDealt SMALLINT,
             towerKills TINYINT,

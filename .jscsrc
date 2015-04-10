@@ -35,7 +35,7 @@
   // "disallowSpacesInsideParentheses": true,
   "disallowTrailingComma": true,
   "disallowTrailingWhitespace": true,
-  "requireCommaBeforeLineBreak": true,
+  // "requireCommaBeforeLineBreak": true,
   "requireLineFeedAtFileEnd": true,
   "requireSpaceAfterBinaryOperators": [
     "?", ":",

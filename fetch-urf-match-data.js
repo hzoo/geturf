@@ -13,6 +13,7 @@ module.exports = function(options) {
     const matchUrl = options.firebaseMatchUrl;
     const Firebase = options.firebase;
     const lolapi = options.lolapi;
+    const region = options.region;
 
     const idsRef = new Firebase(`https://${gameIdsUrl}.firebaseio.com/`);
     const matchesRef = new Firebase(`https://${matchUrl}.firebaseio.com/`);
@@ -67,7 +68,8 @@ module.exports = function(options) {
 
                 // add matches to db
                 const match = {
-                    matchCreation: data.matchCreation,
+                    // don't save miliseconds
+                    matchCreation: Math.floor(Number(data.matchCreation) / 1000),
                     matchDuration: data.matchDuration,
                     matchId: data.matchId,
                     region: data.region
@@ -147,12 +149,16 @@ module.exports = function(options) {
                     });
                 });
 
-                // save last updated matchId
-                matchesRef.update({
-                    lastTimestampFetched: {
-                        timestamp: timestamp,
-                        currentMatchIndex: currentMatchIndex
-                    }
+                // update last timestamp in db
+                const updateAPITable = `
+                    UPDATE api SET
+                        lastTimestamp=${timestamp},
+                        matchIndex=${currentMatchIndex}
+                    WHERE region='${data.region}'
+                `;
+
+                connection.query(updateAPITable, function(err, rows) {
+                    if (err && err.code !== 'ER_DUP_ENTRY') throw err;
                 });
 
                 // get next match
@@ -186,25 +192,22 @@ module.exports = function(options) {
     }
 
     function cron(matchId, interval) {
-        console.log('cron: ' + matchId);
         setTimeout(function() {
             fetchMatchData(matchId);
         }, interval || 1250);
     }
 
-    // get timestamp of last match saved
-    const p1 = new Promise(
-        function(resolve) {
-            matchesRef.child('lastTimestampFetched').on('value', function(snapshot) {
-            resolve(snapshot.val());
-        }, function(errorObject) {
-            console.log(`matchesRef: The read failed: ${errorObject.code}`);
-        });
-    });
+    // get last api stats
+    connection.query(`
+        SELECT lastTimestamp, matchIndex
+        FROM api
+        WHERE region='${region}'
+    `, function(err, rows) {
+        if (err) throw err;
+        let lastTimestampFetched = rows[0];
+        timestamp = lastTimestampFetched.lastTimestamp;
 
-    p1.then(function(lastTimestampFetched) {
-        console.log('p1 then: ' + lastTimestampFetched.timestamp);
-        timestamp = lastTimestampFetched.timestamp;
+        console.log('p1 then: ' + timestamp);
         // use timestamp to get array of matches
         idsRef.child(timestamp).on('value', function(snapshot) {
             const arr = snapshot.val();

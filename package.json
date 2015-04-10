@@ -9,6 +9,7 @@
     "babel": "^5.0.12",
     "firebase": "^2.2.3",
     "lolapi": "^0.2.3",
+    "mysql": "^2.6.1",
     "nconf": "^0.7.1"
   },
   "main": "index.js",

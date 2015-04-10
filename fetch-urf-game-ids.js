@@ -2,10 +2,11 @@ module.exports = function(options) {
     const firebaseUrl = options.firebaseUrl;
     const Firebase = options.firebase;
     const lolapi = options.lolapi;
+    const region = options.region;
 
     const ref = new Firebase(`https://${firebaseUrl}.firebaseio.com/`);
 
-    // get lastTimestamp from firebase (first urf match is 1427866500)
+    // get lastTimestamp from firebase (first urf timestamp is 1427866500)
     const p1 = new Promise(
     function(resolve) {
       ref.child('lastTimestamp').on('value', function(snapshot) {

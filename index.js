@@ -11,6 +11,7 @@ console.log('Fetching URF Game Ids...')
 require('./fetch-urf-game-ids')({
     firebase: Firebase,
     lolapi: lolapi,
+    region: getConfig('LOL_REGION'),
     firebaseUrl: getConfig('FIREBASE_URL_GAMEIDS')
 });
 
@@ -18,6 +19,7 @@ console.log('Fetching URF Match Data...')
 require('./fetch-urf-match-data')({
     firebase: Firebase,
     lolapi: lolapi,
+    region: getConfig('LOL_REGION'),
     firebaseGameIdsUrl: getConfig('FIREBASE_URL_GAMEIDS'),
     firebaseMatchUrl: getConfig('FIREBASE_URL_MATCH_DATA'),
     host: getConfig('DB_HOST'),
@@ -29,6 +31,7 @@ require('./fetch-urf-match-data')({
 // require('./test')({
 //     firebase: Firebase,
 //     lolapi: lolapi,
+//     region: getConfig('LOL_REGION'),
 //     firebaseGameIdsUrl: getConfig('FIREBASE_URL_GAMEIDS'),
 //     firebaseMatchUrl: getConfig('FIREBASE_URL_MATCH_DATA')
 // });
