@@ -3,6 +3,7 @@ module.exports = function(options) {
     const Firebase = options.firebase;
     const lolapi = options.lolapi;
     const region = options.region;
+    const nodeENV = options.nodeENV;
 
     const ref = new Firebase(`https://${firebaseUrl}.firebaseio.com/`);
 
@@ -16,7 +17,12 @@ module.exports = function(options) {
       });
     });
 
-    const longInterval = 600000;
+    var longInterval = 300000;
+    if (nodeENV === 'production') {
+        var shortInterval = 1200;
+    } else {
+        var shortInterval = 500;
+    }
 
     function fetchURFMatches(timestamp) {
         lolapi.ApiChallenge.get(timestamp, function(error, result) {

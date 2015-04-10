@@ -14,6 +14,7 @@ module.exports = function(options) {
     const Firebase = options.firebase;
     const lolapi = options.lolapi;
     const region = options.region;
+    const nodeENV = options.nodeENV;
 
     const idsRef = new Firebase(`https://${gameIdsUrl}.firebaseio.com/`);
     const matchesRef = new Firebase(`https://${matchUrl}.firebaseio.com/`);
@@ -53,6 +54,13 @@ module.exports = function(options) {
                     return `(${o})`;
                 }).join(',')}
         `;
+    }
+
+    var longInterval = 300000;
+    if (nodeENV === 'production') {
+        var shortInterval = 1200;
+    } else {
+        var shortInterval = 500;
     }
 
     function fetchMatchData(matchId) {
@@ -222,7 +230,7 @@ module.exports = function(options) {
 
                             matches = arr;
                             currentMatchIndex = 0;
-                            cron(matches[currentMatchIndex], 600000);
+                            cron(matches[currentMatchIndex], longInterval);
                         });
                     }
                 }
