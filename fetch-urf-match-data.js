@@ -60,6 +60,8 @@ module.exports = function(options) {
             console.log(`Match ID: ${matchId}`);
             if (error) {
                 console.log(`Error: ${error}`);
+                console.log(`Retrying...`);
+                cron(matches[currentMatchIndex]);
             } else {
                 // trim data
                 var data = result;
