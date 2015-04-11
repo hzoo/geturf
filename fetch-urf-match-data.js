@@ -239,9 +239,11 @@ module.exports = function(options) {
                     cron(matches[currentMatchIndex]);
                 }
             } else {
-                console.log('Error fetchMatches: ' + arr);
+                console.log('Error fetchMatches: trying ', timestamp + 300);
                 // fetch next 5 minute interval
-                fetchMatches({ timestamp: timestamp + 300 });
+                setTimeout(function() {
+                    fetchMatches({ timestamp: timestamp + 300 });
+                }, 100);
             }
         });
     }
