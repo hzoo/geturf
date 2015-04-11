@@ -9,9 +9,13 @@ Create a json file at `./config.json`.
     "FIREBASE_URL_MATCH_DATA": "urfmatches", 
     "LOL_REGION": "LOL-REGION-HERE", // ex: na
     "LOL_TOKEN": "LOL-API-TOKEN-HERE",
-    "HOST": "DB-HOST-HERE", // localhost unless you use a service
+    "DB_HOST": "DB-HOST-HERE", // localhost unless you use a service
     "DB_USER": "DB-USER-HERE",
-    "DB_PASSWORD": "DB-PASSWORD-HERE"
+    "DB_PASSWORD": "DB-PASSWORD-HERE",
+    "DB_NAME": "DB-DATABASE-NAME",
+    "SSL_CA": "",
+    "SSL_CERT": "",
+    "SSL_KEY": ""
 }
 ```
 
