@@ -207,20 +207,26 @@ module.exports = function(options) {
                     if (timestamp < (Date.now() / 1000)) {
                         idsRef.child(timestamp).on('value', function(snapshot) {
                             const arr = snapshot.val();
-                            console.log('num matches: ' + arr.length);
 
-                            matches = arr;
-                            currentMatchIndex = 0;
-                            cron(matches[currentMatchIndex]);
+                            if (Array.isArray(arr)) {
+                                matches = arr;
+                                currentMatchIndex = 0;
+                                cron(matches[currentMatchIndex]);
+                            } else {
+                                console.log('Error: idsRef: ' + arr);
+                            }
                         });
                     } else {
                         idsRef.child(timestamp).on('value', function(snapshot) {
                             const arr = snapshot.val();
-                            console.log('num matches: ' + arr.length);
 
-                            matches = arr;
-                            currentMatchIndex = 0;
-                            cron(matches[currentMatchIndex], longInterval);
+                            if (Array.isArray(arr)) {
+                                matches = arr;
+                                currentMatchIndex = 0;
+                                cron(matches[currentMatchIndex], longInterval);
+                            } else {
+                                console.log('Error: idsRef: ' + arr);
+                            }
                         });
                     }
                 }
