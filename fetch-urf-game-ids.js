@@ -21,19 +21,19 @@ module.exports = function(options) {
     if (nodeENV === 'production') {
         var shortInterval = 1200;
     } else {
-        var shortInterval = 500;
+        var shortInterval = 2500;
     }
 
     function fetchURFMatches(timestamp) {
         lolapi.ApiChallenge.get(timestamp, function(error, result) {
-            console.log(timestamp);
+            // console.log('Fetch: ' + timestamp);
             if (error) {
                 console.log('Error: ', error);
                 console.log('Already got the latest game IDs, will check every 10 minutes');
                 // try again
                 cron(timestamp, longInterval);
             } else {
-                console.log(`${result.length} Games played`);
+                // console.log(`${result.length}`);
 
                 // save list of match IDs to the timestamp given
                 let resultObject = {};
@@ -62,7 +62,7 @@ module.exports = function(options) {
         var nextTimestamp = timestamp + 300;
         setTimeout(function() {
             fetchURFMatches(nextTimestamp);
-        }, interval || 2500);
+        }, interval || shortInterval);
     }
 
     p1.then(function(timestamp) {

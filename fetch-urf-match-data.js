@@ -48,9 +48,9 @@ module.exports = function(options) {
 
     var longInterval = 300000;
     if (nodeENV === 'production') {
-        var shortInterval = 1200;
+        var shortInterval = process.env['FETCH_MATCH_INTERVAL'] || 500;
     } else {
-        var shortInterval = 500;
+        var shortInterval = 1200;
     }
 
     function fetchMatchData(matchId) {
@@ -231,7 +231,7 @@ module.exports = function(options) {
     function cron(matchId, interval) {
         setTimeout(function() {
             fetchMatchData(matchId);
-        }, interval || 1200);
+        }, interval || shortInterval);
     }
 
     // get last api stats

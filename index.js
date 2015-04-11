@@ -6,7 +6,6 @@ var getConfig = conf => process.env[String(conf)] || nconf.get(String(conf));
 
 const lolapi = require('lolapi')(getConfig('LOL_TOKEN'), getConfig('LOL_REGION'));
 
-// (limitPer10s, limitPer10min)
 const nodeENV = getConfig('NODE_ENV');
 
 const mysql = require('mysql');
@@ -20,6 +19,7 @@ let mysqlOptions = {
 const fs = require('fs');
 const path = require('path');
 if (nodeENV === 'production') {
+    // (limitPer10s, limitPer10min)
     lolapi.setRateLimit(3000, 180000);
     mysqlOptions.sql = {
         ca: fs.readFileSync(getConfig('SSL_CA')),
@@ -31,7 +31,6 @@ if (nodeENV === 'production') {
 }
 
 const connection = mysql.createConnection(mysqlOptions);
-
 connection.connect();
 
 console.log('Fetching URF Game Ids...')
