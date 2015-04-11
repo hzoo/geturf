@@ -1,6 +1,10 @@
 Urf
 ---
 
+## Installation
+- [io.js](https://iojs.org/): `nvm install 1.6.3 && nvm use 1.6.3`
+- MySQL (local or server): `apt-get install mysql-server`
+
 Create a json file at `./config.json`.
 
 ```json
@@ -21,10 +25,12 @@ Create a json file at `./config.json`.
 
 run `npm start`
 
-1. Save List of URF matches from endpoint.
-    - For each timestamp (every 5 min): save an array of match IDs
-2. For each match ID, get match data from another endpoint
-3. Transform result (remove unused fields, etc)
-4. Save to db.
-5. Figure out queries to send to site
+## Data Flow
+1. Get 5 minute timestamps starting from `1427866500`.
+2. Send timestamps to the endpoint `api-challenge-v4.1` to get a list of URF match IDs.
+2. For each match ID, get match data from the endpoint `match-v2.2`.
+3. Transform result (remove unused fields, etc).
+    4. Create tables for matches, players, bans.
+4. Save to the databse (firebase -> local -> server db).
+5. Figure out queries to send to site.
 6. Vizualize.
