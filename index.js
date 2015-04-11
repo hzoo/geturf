@@ -8,11 +8,31 @@ const lolapi = require('lolapi')(getConfig('LOL_TOKEN'), getConfig('LOL_REGION')
 
 // (limitPer10s, limitPer10min)
 const nodeENV = getConfig('NODE_ENV');
+
+const mysql = require('mysql');
+let mysqlOptions = {
+  host: getConfig('DB_HOST'),
+  user: getConfig('DB_USER'),
+  password: getConfig('DB_PASSWORD'),
+  database: getConfig('DB_NAME')
+};
+
+const fs = require('fs');
+const path = require('path');
 if (nodeENV === 'production') {
     lolapi.setRateLimit(3000, 180000);
+    mysqlOptions.sql = {
+        ca: fs.readFileSync(getConfig('SSL_CA')),
+        cert: fs.readFileSync(getConfig('SSL_CERT')),
+        key: fs.readFileSync(getConfig('SSL_KEY'))
+    }
 } else {
     lolapi.setRateLimit(10, 500);
 }
+
+const connection = mysql.createConnection(mysqlOptions);
+
+connection.connect();
 
 console.log('Fetching URF Game Ids...')
 require('./fetch-urf-game-ids')({
@@ -31,9 +51,7 @@ require('./fetch-urf-match-data')({
     region: getConfig('LOL_REGION'),
     firebaseGameIdsUrl: getConfig('FIREBASE_URL_GAMEIDS'),
     firebaseMatchUrl: getConfig('FIREBASE_URL_MATCH_DATA'),
-    host: getConfig('DB_HOST'),
-    user: getConfig('DB_USER'),
-    password: getConfig('DB_PASSWORD')
+    connection: connection
 });
 
 // console.log('test');

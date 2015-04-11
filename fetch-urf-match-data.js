@@ -1,14 +1,5 @@
 module.exports = function(options) {
-    const mysql = require('mysql');
-    const connection = mysql.createConnection({
-      host: options.host,
-      user: options.user,
-      password: options.password,
-      database: 'URF'
-    });
-
-    connection.connect();
-
+    const connection = options.connection;
     const gameIdsUrl = options.firebaseGameIdsUrl;
     const matchUrl = options.firebaseMatchUrl;
     const Firebase = options.firebase;
@@ -17,7 +8,6 @@ module.exports = function(options) {
     const nodeENV = options.nodeENV;
 
     const idsRef = new Firebase(`https://${gameIdsUrl}.firebaseio.com/`);
-    const matchesRef = new Firebase(`https://${matchUrl}.firebaseio.com/`);
 
     var matches = [];
     var currentMatchIndex;
