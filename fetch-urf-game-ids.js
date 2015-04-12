@@ -29,7 +29,7 @@ module.exports = function(options) {
             // console.log('Fetch: ' + timestamp);
             if (error) {
                 console.log('Error: ', error);
-                console.log('Already got the latest game IDs, will check every 10 minutes');
+                console.log('Already got the latest, will check every 10 minutes: ' + timestamp);
                 // try again
                 cron(timestamp, longInterval);
             } else {

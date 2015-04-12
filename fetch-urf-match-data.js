@@ -239,7 +239,7 @@ module.exports = function(options) {
                     cron(matches[currentMatchIndex]);
                 }
             } else {
-                console.log('Error fetchMatches: trying ', timestamp + 300);
+                console.log('Error fetchMatches: trying ', timestamp + 300, (Date.now() / 1000));
                 // fetch next 5 minute interval
                 if (timestamp + 300 < (Date.now() / 1000)) {
                     setTimeout(function() {
@@ -252,24 +252,6 @@ module.exports = function(options) {
                 }
             }
         });
-    }
-
-    // set match array and current position, and start fetching
-    function fetchMatchesCallback(snapshot) {
-        const arr = snapshot.val();
-
-        if (Array.isArray(arr)) {
-            matches = arr;
-            currentMatchIndex = lastFetch.currentMatchIndex || 0;
-
-            if (timestamp < (Date.now() / 1000)) {
-                cron(matches[currentMatchIndex]);
-            } else {
-                cron(matches[currentMatchIndex], longInterval);
-            }
-        } else {
-            console.log('Error: idsRef: ' + arr);
-        }
     }
 
     // get last api stats
