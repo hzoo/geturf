@@ -31,7 +31,7 @@ module.exports = function(options) {
                 console.log('Error: ', error);
                 console.log('Already got the latest, will check every 10 minutes: ' + timestamp);
                 // try again
-                cron(timestamp, longInterval);
+                cron(timestamp - 300, longInterval);
             } else {
                 // console.log(`${result.length}`);
 
