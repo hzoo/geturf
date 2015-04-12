@@ -240,19 +240,21 @@ module.exports = function(options) {
                 }
             } else {
                 console.log('Error fetchMatches: trying ', timestamp + 300, (Date.now() / 1000));
-                idsRef.child('lastTimestamp').on('value', function(snap) {
-                    const idsLastTimestamp = snap.val();
-                    if (idsLastTimestamp < timestamp + 300) {
-                        setTimeout(function() {
-                            fetchMatches({ timestamp: timestamp + 300 });
-                        }, longInterval);
-                    } else {
-                        // fetch next 5 minute interval
-                        setTimeout(function() {
-                            fetchMatches({ timestamp: timestamp + 300 });
-                        }, 100);
-                    }
-                })
+                if (timestamp + 300 < (Date.now / 1000)) {
+                    idsRef.child('lastTimestamp').on('value', function(snap) {
+                        const idsLastTimestamp = snap.val();
+                        if (idsLastTimestamp < timestamp + 300) {
+                            setTimeout(function() {
+                                fetchMatches({ timestamp: timestamp + 300 });
+                            }, longInterval);
+                        } else {
+                            // fetch next 5 minute interval
+                            setTimeout(function() {
+                                fetchMatches({ timestamp: timestamp + 300 });
+                            }, 100);
+                        }
+                    });
+                }
             }
         });
     }
