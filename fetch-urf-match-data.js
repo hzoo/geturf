@@ -225,6 +225,12 @@ module.exports = function(options) {
 
     // get list of matchIds from timestamp
     function fetchMatches({ timestamp, lastFetch, longInterval }) {
+        // invalid timestamp
+        if (timestamp >= 142891700) {
+            console.log('Stopping fetch: reached end.');
+            return;
+        }
+
         idsRef.child(timestamp).on('value', function(snapshot) {
             const arr = snapshot.val();
 
@@ -267,6 +273,9 @@ module.exports = function(options) {
     `, function(err, rows) {
         if (err) {
             console.log('Error lastFetch: ' + err);
+            if (err.code === 'ER_ACCESS_DENIED_ERROR') {
+                throw err;
+            }
         }
         let lastFetch = rows[0];
         timestamp = lastFetch.lastTimestamp;

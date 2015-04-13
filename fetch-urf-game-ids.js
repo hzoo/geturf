@@ -25,6 +25,12 @@ module.exports = function(options) {
     }
 
     function fetchURFMatches(timestamp) {
+        // invalid timestamp
+        if (timestamp >= 142891700) {
+            console.log('Stopping fetch: reached end.');
+            return;
+        }
+
         lolapi.ApiChallenge.get(timestamp, function(error, result) {
             // console.log('Fetch: ' + timestamp);
             if (error) {
