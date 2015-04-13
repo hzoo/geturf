@@ -9,16 +9,16 @@ module.exports = {
     `,
     populateAPITable: `
         INSERT INTO api
-        VALUES (NULL,NULL,'BR'),
-               (NULL,NULL,'EUNE'),
-               (NULL,NULL,'EUW'),
-               (NULL,NULL,'KR'),
-               (NULL,NULL,'LAN'),
-               (NULL,NULL,'LAS'),
-               (NULL,NULL,'NA'),
-               (NULL,NULL,'OCE'),
-               (NULL,NULL,'TR'),
-               (NULL,NULL,'RU')
+        VALUES (1427865900,NULL,'BR'),
+               (1427866200,NULL,'EUNE'),
+               (1427873400,NULL,'EUW'),
+               (1428364500,NULL,'KR'),
+               (1427866200,NULL,'LAN'),
+               (1427865900,NULL,'LAS'),
+               (1427866500,NULL,'NA'),
+               (1427865900,NULL,'OCE'),
+               (1427873400,NULL,'TR'),
+               (1427873100,NULL,'RU')
     `,
     createBanTable: `
         CREATE TABLE bans (
