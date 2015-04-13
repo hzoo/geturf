@@ -1,4 +1,13 @@
 module.exports = {
+    createMatchIDsTable: `
+        CREATE TABLE matchIDs (
+            id MEDIUMINT NOT NULL AUTO_INCREMENT,
+            timeBucket BIGINT UNSIGNED,
+            matchId INT UNSIGNED,
+            region VARCHAR(4) NOT NULL,
+            PRIMARY KEY (id)
+        )
+    `,
     createAPITable: `
         CREATE TABLE api (
             lastTimestamp BIGINT UNSIGNED,

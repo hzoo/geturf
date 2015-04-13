@@ -27,7 +27,7 @@ module.exports = function(options) {
     function fetchURFMatches(timestamp) {
         // invalid timestamp
         if (timestamp >= 142891700) {
-            console.log('Stopping fetch: reached end.');
+            console.log('Stopping fetch ids: reached end.');
             return;
         }
 

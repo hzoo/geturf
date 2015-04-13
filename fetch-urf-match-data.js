@@ -227,7 +227,8 @@ module.exports = function(options) {
     function fetchMatches({ timestamp, lastFetch, longInterval }) {
         // invalid timestamp
         if (timestamp >= 142891700) {
-            console.log('Stopping fetch: reached end.');
+            console.log('Stopping fetch matches: reached end.');
+            connection.end();
             return;
         }
 
