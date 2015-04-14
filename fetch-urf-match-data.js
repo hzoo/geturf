@@ -240,7 +240,7 @@ module.exports = function(options) {
                     throw err;
                 }
             }
-            if (Array.isArray(arr)) {
+            if (Array.isArray(arr) && arr.length > 0) {
                 matches = arr;
                 if (lastFetch) {
                     currentMatchIndex = lastFetch.currentMatchIndex || 0;

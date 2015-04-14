@@ -27,7 +27,7 @@ module.exports = function(options) {
 
     var longInterval = 300000;
     if (nodeENV === 'production') {
-        var shortInterval = 600;
+        var shortInterval = process.env['FETCH_URF_IDS_INTERVAL'] || 600;
     } else {
         var shortInterval = 2500;
     }

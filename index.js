@@ -3,7 +3,9 @@ const nconf = require('nconf');
 nconf.argv().env().file({ file: 'config.json' });
 var getConfig = conf => process.env[String(conf)] || nconf.get(String(conf));
 
-const lolapi = require('lolapi')(getConfig('LOL_TOKEN'), getConfig('LOL_REGION'));
+const region = getConfig('LOL_REGION');
+console.log('region: ' + region);
+const lolapi = require('lolapi')(getConfig('LOL_TOKEN'), region);
 
 const nodeENV = getConfig('NODE_ENV');
 
@@ -40,7 +42,7 @@ connection.connect(function(err) {
     require('./fetch-urf-game-ids')({
         lolapi: lolapi,
         nodeENV: nodeENV,
-        region: getConfig('LOL_REGION'),
+        region: region,
         connection: connection
     });
 
