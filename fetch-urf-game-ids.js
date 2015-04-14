@@ -20,7 +20,7 @@ module.exports = function(options) {
         let lastFetch = rows[0];
         let lastTimeBucket = lastFetch.lastTimeBucket;
 
-        console.log('Last Fetch: ' + lastTimeBucket);
+        console.log('Last Fetch ids: ' + lastTimeBucket);
 
         cron(lastTimeBucket);
     });

@@ -5,7 +5,7 @@ module.exports = function(options) {
     const nodeENV = options.nodeENV;
 
     var matches = [];
-    var currentMatchIndex;
+    var currentMatchIndex = 0;
     var timestamp;
 
     function getObjectValues(obj) {
@@ -243,7 +243,7 @@ module.exports = function(options) {
             if (Array.isArray(arr) && arr.length > 0) {
                 matches = arr;
                 if (lastFetch) {
-                    currentMatchIndex = lastFetch.currentMatchIndex || 0;
+                    currentMatchIndex = lastFetch.matchIndex || 0;
                 }
                 if (longInterval) {
                     cron(matches[currentMatchIndex].matchId, longInterval);
@@ -251,34 +251,34 @@ module.exports = function(options) {
                     cron(matches[currentMatchIndex].matchId);
                 }
             } else {
-                console.log('Error fetchMatches: trying ', timestamp + 300, (Date.now() / 1000));
-                if (timestamp + 300 < (Date.now / 1000)) {
-                    connection.query(`
-                        SELECT lastTimestamp
-                        FROM api
-                        WHERE region='${region}'
-                    `, function(err, arr) {
-                        if (err) {
-                            if (err.code === 'ER_ACCESS_DENIED_ERROR') {
-                                throw err;
-                            }
-                        }
-
-                        const idsLastTimestamp = arr[0].lastTimestamp;
-                        console.log(idsLastTimestamp);
-
-                        if (idsLastTimestamp < timestamp + 300) {
-                            setTimeout(function() {
-                                fetchMatches({ timestamp: timestamp + 300 });
-                            }, longInterval);
+                console.log('Error fetchMatches: trying ', timestamp + 300);
+                connection.query(`
+                    SELECT lastTimestamp
+                    FROM api
+                    WHERE region='${region}'
+                `, function(err, arr) {
+                    if (err) {
+                        if (err.code === 'ER_ACCESS_DENIED_ERROR') {
+                            throw err;
                         } else {
-                            // fetch next 5 minute interval
-                            setTimeout(function() {
-                                fetchMatches({ timestamp: timestamp + 300 });
-                            }, 100);
+                            console.log(err);
                         }
-                    });
-                }
+                    }
+
+                    const idsLastTimestamp = arr[0].lastTimestamp;
+                    console.log('idsLastTimestamp: ' + idsLastTimestamp);
+
+                    if (idsLastTimestamp < timestamp + 300) {
+                        setTimeout(function() {
+                            fetchMatches({ timestamp: timestamp + 300 });
+                        }, longInterval);
+                    } else {
+                        // fetch next 5 minute interval
+                        setTimeout(function() {
+                            fetchMatches({ timestamp: timestamp + 300 });
+                        }, 100);
+                    }
+                });
             }
         });
     }
@@ -298,7 +298,7 @@ module.exports = function(options) {
         let lastFetch = rows[0];
         timestamp = lastFetch.lastTimestamp;
 
-        console.log('Last Fetch: ' + timestamp);
+        console.log('Last Fetch matches: ' + timestamp);
 
         // use timestamp to get array of matches
         fetchMatches({ timestamp, lastFetch });
