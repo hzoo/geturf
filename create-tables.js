@@ -13,21 +13,22 @@ module.exports = {
             lastTimestamp BIGINT UNSIGNED,
             matchIndex SMALLINT UNSIGNED,
             region VARCHAR(4) NOT NULL,
+            lastTimeBucket BIGINT UNSIGNED,
             PRIMARY KEY (region)
         )
     `,
     populateAPITable: `
         INSERT INTO api
-        VALUES (1427865900,NULL,'BR'),
-               (1427866200,NULL,'EUNE'),
-               (1427873400,NULL,'EUW'),
-               (1428364500,NULL,'KR'),
-               (1427866200,NULL,'LAN'),
-               (1427865900,NULL,'LAS'),
-               (1427866500,NULL,'NA'),
-               (1427865900,NULL,'OCE'),
-               (1427873400,NULL,'TR'),
-               (1427873100,NULL,'RU')
+        VALUES (1427865900,NULL,'BR',1427865900),
+               (1427866200,NULL,'EUNE',1427866200),
+               (1427873400,NULL,'EUW',1427873400),
+               (1428360900,NULL,'KR',1428360900),
+               (1427866200,NULL,'LAN',1427866200),
+               (1427865900,NULL,'LAS',1427865900),
+               (1427866500,NULL,'NA',1427866500),
+               (1427865900,NULL,'OCE',1427865900),
+               (1427873400,NULL,'TR',1427873400),
+               (1427873100,NULL,'RU,1427873100')
     `,
     createBanTable: `
         CREATE TABLE bans (

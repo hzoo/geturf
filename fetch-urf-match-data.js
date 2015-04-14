@@ -1,12 +1,8 @@
 module.exports = function(options) {
     const connection = options.connection;
-    const gameIdsUrl = options.firebaseGameIdsUrl;
-    const matchUrl = options.firebaseMatchUrl;
-    const Firebase = options.firebase;
     const lolapi = options.lolapi;
     const region = options.region;
     const nodeENV = options.nodeENV;
-    const idsRef = new Firebase(`https://${gameIdsUrl}.firebaseio.com/`);
 
     var matches = [];
     var currentMatchIndex;
@@ -175,7 +171,7 @@ module.exports = function(options) {
             if (error) {
                 console.log(`Error: ${error}`);
                 console.log(`Retrying...`);
-                cron(matches[currentMatchIndex]);
+                cron(matches[currentMatchIndex].matchId);
             } else {
                 // trim data
                 var data = result;
@@ -202,7 +198,7 @@ module.exports = function(options) {
 
                 // get next match
                 if (currentMatchIndex + 1 < matches.length) {
-                    cron(matches[currentMatchIndex++]);
+                    cron(matches[currentMatchIndex++].matchId);
                 } else {
                     // get new timestamp (next 5 minutes)
                     currentMatchIndex = 0;
@@ -226,30 +222,51 @@ module.exports = function(options) {
     // get list of matchIds from timestamp
     function fetchMatches({ timestamp, lastFetch, longInterval }) {
         // invalid timestamp
-        if (timestamp >= 142891700) {
+        if (timestamp >= 1428917000) {
             console.log('Stopping fetch matches: reached end.');
             connection.end();
             return;
         }
 
-        idsRef.child(timestamp).on('value', function(snapshot) {
-            const arr = snapshot.val();
-
+        connection.query(`
+            SELECT matchId
+            FROM matchIDs
+            WHERE region='${region}'
+            AND timeBucket=${timestamp}
+            ORDER BY matchId ASC
+        `, function(err, arr) {
+            if (err) {
+                if (err.code === 'ER_ACCESS_DENIED_ERROR') {
+                    throw err;
+                }
+            }
             if (Array.isArray(arr)) {
                 matches = arr;
                 if (lastFetch) {
                     currentMatchIndex = lastFetch.currentMatchIndex || 0;
                 }
                 if (longInterval) {
-                    cron(matches[currentMatchIndex], longInterval);
+                    cron(matches[currentMatchIndex].matchId, longInterval);
                 } else {
-                    cron(matches[currentMatchIndex]);
+                    cron(matches[currentMatchIndex].matchId);
                 }
             } else {
                 console.log('Error fetchMatches: trying ', timestamp + 300, (Date.now() / 1000));
                 if (timestamp + 300 < (Date.now / 1000)) {
-                    idsRef.child('lastTimestamp').on('value', function(snap) {
-                        const idsLastTimestamp = snap.val();
+                    connection.query(`
+                        SELECT lastTimestamp
+                        FROM api
+                        WHERE region='${region}'
+                    `, function(err, arr) {
+                        if (err) {
+                            if (err.code === 'ER_ACCESS_DENIED_ERROR') {
+                                throw err;
+                            }
+                        }
+
+                        const idsLastTimestamp = arr[0].lastTimestamp;
+                        console.log(idsLastTimestamp);
+
                         if (idsLastTimestamp < timestamp + 300) {
                             setTimeout(function() {
                                 fetchMatches({ timestamp: timestamp + 300 });

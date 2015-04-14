@@ -1,54 +1,76 @@
 module.exports = function(options) {
-    const firebaseUrl = options.firebaseUrl;
-    const Firebase = options.firebase;
+    const connection = options.connection;
     const lolapi = options.lolapi;
     const region = options.region;
     const nodeENV = options.nodeENV;
 
-    const ref = new Firebase(`https://${firebaseUrl}.firebaseio.com/`);
+    // Get last timeBucket
+    // First urf timestamp for NA: 1427866500
+    connection.query(`
+        SELECT *
+        FROM api
+        WHERE region='${region}'
+    `, function(err, rows) {
+        if (err) {
+            console.log('Error lastFetch: ' + err);
+            if (err.code === 'ER_ACCESS_DENIED_ERROR') {
+                throw err;
+            }
+        }
+        let lastFetch = rows[0];
+        let lastTimeBucket = lastFetch.lastTimeBucket;
 
-    // get lastTimestamp from firebase (first urf timestamp is 1427866500)
-    const p1 = new Promise(
-    function(resolve) {
-      ref.child('lastTimestamp').on('value', function(snapshot) {
-        resolve(snapshot.val());
-      }, function(errorObject) {
-        console.log(`The read failed: ${errorObject.code}`);
-      });
+        console.log('Last Fetch: ' + lastTimeBucket);
+
+        cron(lastTimeBucket);
     });
 
     var longInterval = 300000;
     if (nodeENV === 'production') {
-        var shortInterval = 1200;
+        var shortInterval = 600;
     } else {
         var shortInterval = 2500;
     }
 
     function fetchURFMatches(timestamp) {
         // invalid timestamp
-        if (timestamp >= 142891700) {
+        if (timestamp >= 1428917000) {
             console.log('Stopping fetch ids: reached end.');
             return;
         }
 
-        lolapi.ApiChallenge.get(timestamp, function(error, result) {
-            // console.log('Fetch: ' + timestamp);
-            if (error) {
-                console.log('Error: ', error);
-                console.log('Already got the latest, will check every 10 minutes: ' + timestamp);
-                // try again
-                cron(timestamp - 300, longInterval);
-            } else {
-                // console.log(`${result.length}`);
+        // console.log('Fetching: ' + timestamp + ' for region ' + region);
 
-                // save list of match IDs to the timestamp given
-                let resultObject = {};
-                resultObject[timestamp] = result;
-                ref.update(resultObject);
+        lolapi.ApiChallenge.get(timestamp, function(error, result) {
+            if (error) {
+                console.log('Error: ', timestamp, error);
+                cron(timestamp);
+            } else {
+                if (result.length > 0) {
+                    var matchIdQuery = `
+                        INSERT INTO matchIDs (
+                            timeBucket, matchId, region
+                        ) VALUES
+                        ${result.map(function(o) {
+                            return `(${timestamp},${o},'${region}')`;
+                        }).join(',')}
+                    `;
+                    connection.query(matchIdQuery, function(err) {
+                        if (err) {
+                            console.log('Error: INSERT matchIds ', error);
+                        }
+                    });
+                }
 
                 // save last updated timestamp
-                ref.update({
-                    lastTimestamp: timestamp
+                connection.query(`
+                    UPDATE api SET
+                        lastTimeBucket=${timestamp}
+                    WHERE region='${region}'
+                `, function(err) {
+                    if (err) {
+                        console.log('Error: UPDATE lastTimeBucket ', error);
+                    }
                 });
 
                 // If the timestamp + 5 minutes is less than the current time,
@@ -70,8 +92,4 @@ module.exports = function(options) {
             fetchURFMatches(nextTimestamp);
         }, interval || shortInterval);
     }
-
-    p1.then(function(timestamp) {
-        cron(timestamp);
-    });
 }
