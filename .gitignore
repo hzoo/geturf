@@ -5,3 +5,4 @@ node_modules
 config.json
 npm-debug.log
 example-match-query.json
+test.md

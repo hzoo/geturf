@@ -5,7 +5,7 @@ Urf
 - [io.js](https://iojs.org/): `nvm install 1.6.3 && nvm use 1.6.3`
 - MySQL 5.6 (local or server): `apt-get install mysql-server`
 
-Create a json file at `./config.json`.
+Create a json file at `./data/config.json`.
 
 ```json
 {

@@ -1,6 +1,6 @@
 const nconf = require('nconf');
 
-nconf.argv().env().file({ file: 'config.json' });
+nconf.argv().env().file({ file: 'data/config.json' });
 var getConfig = conf => process.env[String(conf)] || nconf.get(String(conf));
 
 const region = getConfig('LOL_REGION');

@@ -3,7 +3,7 @@
   "description": "get urf matches",
   "version": "0.0.1",
   "scripts": {
-    "start": "$(npm bin)/babel-node index.js"
+    "start": "$(npm bin)/babel-node fetch/index.js"
   },
   "dependencies": {
     "babel": "^5.0.12",
@@ -11,7 +11,7 @@
     "mysql": "^2.6.1",
     "nconf": "^0.7.1"
   },
-  "main": "index.js",
+  "main": "fetch/index.js",
   "engines": {
     "iojs": "~1.6.3"
   }
