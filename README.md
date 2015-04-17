@@ -4,6 +4,8 @@ GetUrf
 For the [Riot Games API Challenge](https://developer.riotgames.com/discussion/riot-games-api/show/bX8Z86bm).
 Fetch URF match data and send to a database.
 
+![](screenshot.png)
+
 ## Data Flow
 1. Get 5 minute timestamps starting from `1427866500` (for `NA`).
 2. Send timestamps to the endpoint `api-challenge-v4.1` to get a list of URF match IDs.
@@ -48,6 +50,6 @@ run `npm start`
 - This was able to continuously run until all the matches were fetched in a region and then I would change the `LOL_REGION` config.
 
 ## Misc
-Running on Heroku (It's fetches different regions by changing the LOL_REGION config var).
-Database is using Cloud SQL (tested locally).
-It ended up being a lot easier/faster to just work with things I've used before or have some experience with rather than trying to use something new.
+- Running on Heroku (It's fetches different regions by changing the LOL_REGION config var).
+- Database is using Cloud SQL (tested locally).
+- It ended up being a lot easier/faster to just work with things I've used before or have some experience with rather than trying to use something new.
