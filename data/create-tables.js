@@ -10,7 +10,7 @@ module.exports = {
     `,
     createChampionsTable: `
         CREATE TABLE champions (
-          championId TINYINT UNSIGNED NOT NULL,
+          championId SMALLINT UNSIGNED NOT NULL,
           championName VARCHAR(20) NOT NULL
         )
     `,
@@ -38,7 +38,7 @@ module.exports = {
     `,
     createBanTable: `
         CREATE TABLE bans (
-            championId TINYINT UNSIGNED NOT NULL,
+            championId SMALLINT UNSIGNED NOT NULL,
             matchId BIGINT UNSIGNED,
             pickTurn TINYINT UNSIGNED,
             region VARCHAR(4) NOT NULL,
