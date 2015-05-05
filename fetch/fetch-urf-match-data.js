@@ -64,10 +64,12 @@ module.exports = function(options) {
             insertBanQueryArr.push(getObjectValues(ban));
         });
 
-        const insertBanQuery = createBatchedInsertQuery('bans', bansData[0], insertBanQueryArr);
-        connection.query(insertBanQuery, function(err, rows) {
-            if (err && err.code !== 'ER_DUP_ENTRY') throw err;
-        });
+        if (bansData.length > 0) {
+            const insertBanQuery = createBatchedInsertQuery('bans', bansData[0], insertBanQueryArr);
+            connection.query(insertBanQuery, function(err, rows) {
+                if (err && err.code !== 'ER_DUP_ENTRY') throw err;
+            });
+        }
     }
 
     function runMatchesQuery(data) {
@@ -180,10 +182,10 @@ module.exports = function(options) {
                 runBansQuery(data);
 
                 // matches
-                runMatchesQuery(data);
+                // runMatchesQuery(data);
 
                 // players
-                runPlayersQuery(data);
+                // runPlayersQuery(data);
 
                 // update last timestamp in db
                 const updateAPITable = `

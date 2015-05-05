@@ -1,17 +1,17 @@
 module.exports = {
     createMatchIDsTable: `
         CREATE TABLE matchIDs (
-            id MEDIUMINT NOT NULL AUTO_INCREMENT,
-            timeBucket BIGINT UNSIGNED,
-            matchId INT UNSIGNED,
+            timeBucket BIGINT UNSIGNED NOT NULL,
+            matchId INT UNSIGNED NOT NULL,
             region VARCHAR(4) NOT NULL,
-            PRIMARY KEY (id)
+            PRIMARY KEY (timeBucket, matchId, region)
         )
     `,
     createChampionsTable: `
         CREATE TABLE champions (
           championId SMALLINT UNSIGNED NOT NULL,
-          championName VARCHAR(30) NOT NULL
+          championName VARCHAR(30) NOT NULL,
+          PRIMARY KEY (championId)
         )
     `,
     createItemsTable: `
